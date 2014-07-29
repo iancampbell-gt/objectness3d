@@ -245,10 +245,10 @@ void eigen_decomposition(double A[n][n], double V[n][n], double d[n]) {
 
 void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] ) {
     double *Dxx, *Dxy, *Dxz, *Dyy, *Dyz, *Dzz;
-    double *Dvecx, *Dvecy, *Dvecz, *Deiga, *Deigb, *Deigc;
+    double *Dvecx, *Dvecy, *Dvecz, *Dvecx2, *Dvecy2, *Dvecz2, *Dvecx3, *Dvecy3, *Dvecz3, *Deiga, *Deigb, *Deigc;
 
     float *Dxx_f, *Dxy_f, *Dxz_f, *Dyy_f, *Dyz_f, *Dzz_f;
-    float *Dvecx_f, *Dvecy_f, *Dvecz_f, *Deiga_f, *Deigb_f, *Deigc_f;
+    float *Dvecx_f, *Dvecy_f, *Dvecz_f, *Dvecx2_f, *Dvecy2_f, *Dvecz2_f, *Dvecx3_f, *Dvecy3_f, *Dvecz3_f, *Deiga_f, *Deigb_f, *Deigc_f;
 
     mwSize output_dims[2]={1, 3};
     double Ma[3][3];
@@ -269,7 +269,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] ) {
     if(nrhs!=6) {
         mexErrMsgTxt("Six inputs are required.");
     } else if(nlhs<3) {
-        mexErrMsgTxt("Three or Six outputs are required");
+        mexErrMsgTxt("Three or Twelve outputs are required");
     }
     
    
@@ -293,12 +293,20 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] ) {
         plhs[1] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
         plhs[2] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
         Deiga = mxGetPr(plhs[0]); Deigb = mxGetPr(plhs[1]); Deigc = mxGetPr(plhs[2]);
-        if(nlhs==6) {
+        if(nlhs==12) {
             /* Main direction (larged eigenvector) */
             plhs[3] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
             plhs[4] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
             plhs[5] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
+            plhs[6] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
+            plhs[7] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
+            plhs[8] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
+            plhs[9] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
+            plhs[10] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
+            plhs[11] = mxCreateNumericArray(nsubs, idims, mxDOUBLE_CLASS, mxREAL);
             Dvecx = mxGetPr(plhs[3]); Dvecy = mxGetPr(plhs[4]); Dvecz = mxGetPr(plhs[5]);
+            Dvecx2 = mxGetPr(plhs[6]); Dvecy2 = mxGetPr(plhs[7]); Dvecz2 = mxGetPr(plhs[8]);
+            Dvecx3 = mxGetPr(plhs[9]); Dvecy3 = mxGetPr(plhs[10]); Dvecz3 = mxGetPr(plhs[11]);			
         }
         
         
@@ -308,11 +316,17 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] ) {
             Ma[2][0]=Dxz[i]; Ma[2][1]=Dyz[i]; Ma[2][2]=Dzz[i];
             eigen_decomposition(Ma, Davec, Daeig);
             Deiga[i]=Daeig[0]; Deigb[i]=Daeig[1]; Deigc[i]=Daeig[2];
-            if(nlhs==6) {
+            if(nlhs==12) {
                 /* Main direction (smallest eigenvector) */
                 Dvecx[i]=Davec[0][0];
                 Dvecy[i]=Davec[1][0];
                 Dvecz[i]=Davec[2][0];
+                Dvecx2[i]=Davec[0][1];
+                Dvecy2[i]=Davec[1][1];
+                Dvecz2[i]=Davec[2][1];
+                Dvecx3[i]=Davec[0][2];
+                Dvecy3[i]=Davec[1][2];
+                Dvecz3[i]=Davec[2][2];
             }
         }
     }
@@ -332,15 +346,27 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] ) {
         Deiga_f  = (float *)mxGetPr(plhs[0]); 
         Deigb_f  = (float *)mxGetPr(plhs[1]); 
         Deigc_f  = (float *)mxGetPr(plhs[2]);
-        if(nlhs==6) {
+        if(nlhs==12) {
             /* Main direction (smallest eigenvector) */
             plhs[3] = mxCreateNumericArray(nsubs, idims, mxSINGLE_CLASS, mxREAL);
             plhs[4] = mxCreateNumericArray(nsubs, idims, mxSINGLE_CLASS, mxREAL);
             plhs[5] = mxCreateNumericArray(nsubs, idims, mxSINGLE_CLASS, mxREAL);
+            plhs[6] = mxCreateNumericArray(nsubs, idims, mxSINGLE_CLASS, mxREAL);
+            plhs[7] = mxCreateNumericArray(nsubs, idims, mxSINGLE_CLASS, mxREAL);
+            plhs[8] = mxCreateNumericArray(nsubs, idims, mxSINGLE_CLASS, mxREAL);
+            plhs[9] = mxCreateNumericArray(nsubs, idims, mxSINGLE_CLASS, mxREAL);
+            plhs[10] = mxCreateNumericArray(nsubs, idims, mxSINGLE_CLASS, mxREAL);
+            plhs[11] = mxCreateNumericArray(nsubs, idims, mxSINGLE_CLASS, mxREAL);
             Dvecx_f  = (float *)mxGetPr(plhs[3]); 
             Dvecy_f  = (float *)mxGetPr(plhs[4]); 
             Dvecz_f  = (float *)mxGetPr(plhs[5]);
-        }
+            Dvecx2_f  = (float *)mxGetPr(plhs[6]); 
+            Dvecy2_f  = (float *)mxGetPr(plhs[7]); 
+            Dvecz2_f  = (float *)mxGetPr(plhs[8]);
+            Dvecx3_f  = (float *)mxGetPr(plhs[9]); 
+            Dvecy3_f  = (float *)mxGetPr(plhs[10]); 
+            Dvecz3_f  = (float *)mxGetPr(plhs[11]);
+          }
         
         
         for(i=0; i<npixels; i++) {
@@ -351,11 +377,17 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] ) {
             Deiga_f[i]=(float)Daeig[0]; 
             Deigb_f[i]=(float)Daeig[1]; 
             Deigc_f[i]=(float)Daeig[2];
-            if(nlhs==6) {
+            if(nlhs==12) {
                 /* Main direction (smallest eigenvector) */
                 Dvecx_f[i]=(float)Davec[0][0]; 
                 Dvecy_f[i]=(float)Davec[1][0]; 
                 Dvecz_f[i]=(float)Davec[2][0];
+                Dvecx2_f[i]=(float)Davec[0][1]; 
+                Dvecy2_f[i]=(float)Davec[1][1]; 
+                Dvecz2_f[i]=(float)Davec[2][1];
+                Dvecx3_f[i]=(float)Davec[0][2]; 
+                Dvecy3_f[i]=(float)Davec[1][2]; 
+                Dvecz3_f[i]=(float)Davec[2][2];
             }
         }
 
